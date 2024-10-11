@@ -10,59 +10,56 @@ function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
   const [editPendencia, setEditPendencia] = useState(null);
 
+  const fetchPendencias = async () => {
+    const { data, error } = await supabase
+      .from('registro_fornecedor')
+      .select('*')
+      .neq('status', 'RESOLVIDO');
+
+    if (error) {
+      console.error('Erro ao buscar pendências:', error);
+    } else {
+      setPendencias(data);
+    }
+  };
+
   useEffect(() => {
-    const fetchPendencias = async () => {
-      const { data, error } = await supabase
-        .from('registro_fornecedor')
-        .select('*')
-        .neq('status', 'RESOLVIDO');
-  
-      if (error) {
-        console.error('Erro ao buscar pendências:', error);
-      } else {
-        setPendencias(data);
-      }
-    };
-  
-    fetchPendencias();
+    fetchPendencias(); 
 
-    // Subscription to realtime updates
+
     const channel = supabase
-    .channel('public:registro_fornecedor')
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'registro_fornecedor' },
-      (payload) => {
-        console.log('Mudança recebida!', payload);
+      .channel('public:registro_fornecedor')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'registro_fornecedor' },
+        (payload) => {
+          console.log('Mudança recebida!', payload);
 
-        if (payload.eventType === 'INSERT') {
-          setPendencias((prevPendencias) => [...prevPendencias, payload.new]);
-        } else if (payload.eventType === 'UPDATE') {
-          if (payload.new.status === 'RESOLVIDO') {
-            // Remover pendência resolvida
+          if (payload.eventType === 'INSERT') {
+            setPendencias((prevPendencias) => [...prevPendencias, payload.new]);
+          } else if (payload.eventType === 'UPDATE') {
+            if (payload.new.status === 'RESOLVIDO') {
+              setPendencias((prevPendencias) =>
+                prevPendencias.filter((p) => p.id !== payload.new.id)
+              );
+            } else {
+              setPendencias((prevPendencias) =>
+                prevPendencias.map((p) =>
+                  p.id === payload.new.id ? payload.new : p
+                )
+              );
+            }
+          } else if (payload.eventType === 'DELETE') {
             setPendencias((prevPendencias) =>
-              prevPendencias.filter((p) => p.id !== payload.new.id)
-            );
-          } else {
-            // Atualizar pendência existente
-            setPendencias((prevPendencias) =>
-              prevPendencias.map((p) =>
-                p.id === payload.new.id ? payload.new : p
-              )
+              prevPendencias.filter((p) => p.id !== payload.old.id)
             );
           }
-        } else if (payload.eventType === 'DELETE') {
-          // Remover pendência deletada
-          setPendencias((prevPendencias) =>
-            prevPendencias.filter((p) => p.id !== payload.old.id)
-          );
         }
-      }
-    )
-    .subscribe();
+      )
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(channel); 
     };
   }, []);
 
@@ -71,20 +68,30 @@ function Dashboard() {
       <h1 className="text-3xl font-bold mb-4">Controle de Pendências CD-Pavuna</h1>
       <button
         onClick={() => setShowForm(true)}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-500"
+        className="fixed bottom-6 right-6 bg-custom-purple text-white p-4 rounded-full shadow-lg hover:bg-hover-custom-purple"
       >
         Abrir Pendência
       </button>
-      {showForm && <PendenciaForm onClose={() => setShowForm(false)} />}
+      {showForm && (
+        <PendenciaForm
+          onClose={() => {
+            setShowForm(false);
+            fetchPendencias(); 
+          }}
+        />
+      )}
       {editPendencia && (
         <EditPendenciaForm
           pendencia={editPendencia}
-          onClose={() => setEditPendencia(null)}
+          onClose={() => {
+            setEditPendencia(null);
+            fetchPendencias();
+          }}
         />
       )}
       <button
         onClick={() => setShowSettings(true)}
-        className="absolute top-6 right-6 text-gray-300 hover:text-white"
+        className="absolute top-6 right-6 text-custom-purple hover:text-hover-custom-purple"
       >
         ⚙️
       </button>
@@ -92,7 +99,7 @@ function Dashboard() {
         <Settings onClose={() => setShowSettings(false)} />
       )}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-gray-800 p-4 rounded shadow">
+        <div className="bg-custom-purple p-4 rounded shadow">
           <h2 className="text-xl font-semibold">Mercearia</h2>
           <p className="text-2xl">
             {
@@ -102,7 +109,7 @@ function Dashboard() {
             }
           </p>
         </div>
-        <div className="bg-gray-800 p-4 rounded shadow">
+        <div className="bg-custom-purple p-4 rounded shadow">
           <h2 className="text-xl font-semibold">Perecíveis</h2>
           <p className="text-2xl">
             {
@@ -149,9 +156,7 @@ function Dashboard() {
               <td className="py-2 px-4 border-b border-gray-700">
                 <button
                   className="text-blue-400 hover:text-blue-300 mr-2"
-                  onClick={() => {
-                    setEditPendencia(pendencia);
-                  }}
+                  onClick={() => setEditPendencia(pendencia)}
                 >
                   Editar
                 </button>
@@ -170,7 +175,7 @@ function Dashboard() {
                       console.error('Erro ao atualizar pendência:', error);
                     } else {
                       alert('Pendência marcada como resolvida!');
-                      // A pendência será removida da lista pela atualização em tempo real
+                      fetchPendencias(); 
                     }
                   }}
                 >
