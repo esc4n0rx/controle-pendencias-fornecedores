@@ -34,18 +34,22 @@ function Settings({ onClose }) {
   };
 
   const handleClearAgendamento = async () => {
+    console.log("Botão de limpar agendamento clicado"); 
     const confirmation = window.confirm(
       'Tem certeza que deseja limpar o agendamento? Esta ação não pode ser desfeita.'
     );
     if (confirmation) {
-      const { error } = await supabase.from('agendamento').delete().neq('id', '');
+      const { error } = await supabase.from('agendamento').delete();
       if (error) {
         console.error('Erro ao limpar agendamento:', error);
+        alert('Erro ao limpar agendamento. Tente novamente.');
       } else {
         alert('Base de agendamento limpa com sucesso!');
+
       }
     }
   };
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75">
