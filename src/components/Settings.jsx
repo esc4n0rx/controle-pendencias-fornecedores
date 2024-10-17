@@ -42,7 +42,7 @@ function Settings({ onClose }) {
       const { error } = await supabase
         .from('agendamento')
         .delete()
-        .in('departamento', ['Mercearia', 'Perecíveis']); 
+        .in('departamento', ['MERCEARIA', 'PERECÍVEIS']); 
   
       if (error) {
         console.error('Erro ao limpar agendamento:', error);
