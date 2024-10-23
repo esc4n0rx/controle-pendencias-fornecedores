@@ -126,7 +126,7 @@ function Dashboard() {
             <th className="py-2 px-4 border-b border-gray-700">Departamento</th>
             <th className="py-2 px-4 border-b border-gray-700">Fornecedor</th>
             <th className="py-2 px-4 border-b border-gray-700">Pedido</th>
-            <th className="py-2 px-4 border-b border-gray-700">Hora</th>
+            <th className="py-2 px-4 border-b border-gray-700">Horario de Chegada no CD</th>
             <th className="py-2 px-4 border-b border-gray-700">Status</th>
             <th className="py-2 px-4 border-b border-gray-700">Motivo</th>
             <th className="py-2 px-4 border-b border-gray-700">Ações</th>
