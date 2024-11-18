@@ -69,6 +69,11 @@ function PendenciaForm({ onClose }) {
     }
   };
 
+
+  const now = new Date();
+  const formattedTime = now.toTimeString().split(" ")[0]; 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -76,7 +81,7 @@ function PendenciaForm({ onClose }) {
       {
         ...formData,
         status: "AGUARDANDO LIBERACAO",
-        hora_abertura: new Date(),
+        hora_abertura: formattedTime,
       },
     ]);
 
@@ -127,16 +132,27 @@ function PendenciaForm({ onClose }) {
             </select>
           </div>
           <div className="mb-4">
-            <label className="block mb-1">Hora de Chegada:</label>
-            <input
-              type="time"
-              value={formData.hora}
-              onChange={(e) =>
-                setFormData({ ...formData, hora: e.target.value })
-              }
-              className="w-full border border-gray-600 bg-gray-700 text-white p-2 rounded"
-            />
-          </div>
+            <label className="block mb-1">Hora de Abertura:</label>
+              <input
+                type="time"
+                value={formData.hora_abertura}
+                onChange={(e) =>
+                  setFormData({ ...formData, hora_abertura: e.target.value })
+                }
+                className="w-full border border-gray-600 bg-gray-700 text-white p-2 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-1">Hora de Chegada:</label>
+              <input
+                type="time"
+                value={formData.hora}
+                onChange={(e) =>
+                  setFormData({ ...formData, hora: e.target.value })
+                }
+                className="w-full border border-gray-600 bg-gray-700 text-white p-2 rounded"
+              />
+            </div>
           <div className="mb-4">
             <label className="block mb-1">Motivo:</label>
             <input

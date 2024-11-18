@@ -126,7 +126,8 @@ function Dashboard() {
             <th className="py-2 px-4 border-b border-gray-700">Departamento</th>
             <th className="py-2 px-4 border-b border-gray-700">Fornecedor</th>
             <th className="py-2 px-4 border-b border-gray-700">Pedido</th>
-            <th className="py-2 px-4 border-b border-gray-700">Horario de Chegada no CD</th>
+            <th className="py-2 px-4 border-b border-gray-700">Horário de Abertura</th>
+            <th className="py-2 px-4 border-b border-gray-700">Horário de Chegada no CD</th>
             <th className="py-2 px-4 border-b border-gray-700">Status</th>
             <th className="py-2 px-4 border-b border-gray-700">Motivo</th>
             <th className="py-2 px-4 border-b border-gray-700">Ações</th>
@@ -143,6 +144,9 @@ function Dashboard() {
               </td>
               <td className="py-2 px-4 border-b border-gray-700">
                 {pendencia.pedido}
+              </td>
+              <td className="py-2 px-4 border-b border-gray-700">
+                {pendencia.hora_abertura}
               </td>
               <td className="py-2 px-4 border-b border-gray-700">
                 {pendencia.hora}
@@ -164,18 +168,18 @@ function Dashboard() {
                   className="text-red-400 hover:text-red-300"
                   onClick={async () => {
                     const { error } = await supabase
-                      .from('registro_fornecedor')
+                      .from("registro_fornecedor")
                       .update({
-                        status: 'RESOLVIDO',
+                        status: "RESOLVIDO",
                         hora_fim: new Date(),
                       })
-                      .eq('id', pendencia.id);
+                      .eq("id", pendencia.id);
 
                     if (error) {
-                      console.error('Erro ao atualizar pendência:', error);
+                      console.error("Erro ao atualizar pendência:", error);
                     } else {
-                      alert('Pendência marcada como resolvida!');
-                      fetchPendencias(); 
+                      alert("Pendência marcada como resolvida!");
+                      fetchPendencias();
                     }
                   }}
                 >
