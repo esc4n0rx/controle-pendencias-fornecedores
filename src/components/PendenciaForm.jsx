@@ -8,6 +8,7 @@ function PendenciaForm({ onClose }) {
     fornecedor: "",
     pedido: "",
     hora: "",
+    hora_abertura: "", // Adicionei hora_abertura ao estado inicial
     motivo: "",
     departamento: "",
   });
@@ -69,10 +70,16 @@ function PendenciaForm({ onClose }) {
     }
   };
 
+  // Não vamos mais usar isso para sobrescrever a hora de abertura
+  // const now = new Date();
+  // const formattedTime = now.toTimeString().split(" ")[0];
 
-  const now = new Date();
-  const formattedTime = now.toTimeString().split(" ")[0]; 
-
+  // Definindo a hora atual quando o componente é montado (opcional)
+  useEffect(() => {
+    const now = new Date();
+    const formattedTime = now.toTimeString().split(" ")[0];
+    setFormData(prev => ({ ...prev, hora_abertura: formattedTime }));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,7 +88,7 @@ function PendenciaForm({ onClose }) {
       {
         ...formData,
         status: "AGUARDANDO LIBERACAO",
-        hora_abertura: formattedTime,
+        // Não sobrescrevemos a hora_abertura aqui, usamos o valor do formulário
       },
     ]);
 
